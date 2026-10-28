@@ -1,0 +1,484 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1DHABCUZe1CS-LZ9_xXEG5e3QZFbVo1uuNQNcXma4Syc",
+          "mode": "list",
+          "cachedResultName": "LinkedIn App Google Store Reviews",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DHABCUZe1CS-LZ9_xXEG5e3QZFbVo1uuNQNcXma4Syc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Raw_Reviews",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DHABCUZe1CS-LZ9_xXEG5e3QZFbVo1uuNQNcXma4Syc/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "status",
+              "lookupValue": "new"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        240,
+        -176
+      ],
+      "id": "af21e512-6ffe-4aab-a9ba-2510b7423329",
+      "name": "Get row(s) in sheet",
+      "executeOnce": false,
+      "retryOnFail": false,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "nkVjzk7SuRTMu9uH",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "models/gemini-3-flash-preview"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Analyze this review of the LinkedIn app and return the response STRICTLY in JSON format, without any Markdown formatting (no json ... ):\n\n{\n\"sentiment\": \"Positive\",\n\"category\": \"App Bugs\",\n\"summary\": \"brief summary of the review in English, in 3–5 words\",\n\"action_needed\": \"Yes\"\n}\n\nPossible values for sentiment: Positive, Negative, Neutral.\n\nPossible values for category: App Bugs, Account Blocked, UI & Design, Job Search, Spam & Bots, Pricing & Subscription, Other.\n\nPossible values for action_needed: Yes, No.\n\nUser rating: {{ $json.review_rating }} stars.\n\nReview text: {{ $json.review_text }}\n"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        400,
+        -176
+      ],
+      "id": "9f22c21a-e795-4c3c-983f-a7e98e101fe0",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1DHABCUZe1CS-LZ9_xXEG5e3QZFbVo1uuNQNcXma4Syc",
+          "mode": "list",
+          "cachedResultName": "LinkedIn App Google Store Reviews",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DHABCUZe1CS-LZ9_xXEG5e3QZFbVo1uuNQNcXma4Syc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1460321210,
+          "mode": "list",
+          "cachedResultName": "Processed_Reviews",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DHABCUZe1CS-LZ9_xXEG5e3QZFbVo1uuNQNcXma4Syc/edit#gid=1460321210"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "review_id": "={{ $('Get row(s) in sheet').item.json.review_id }}",
+            "review_text": "={{ $('Get row(s) in sheet').item.json.review_text }}",
+            "review_rating": "={{ $('Get row(s) in sheet').item.json.review_rating }}",
+            "sentiment Positive / Negative / Neutral": "={{ JSON.parse($json.content.parts[0].text).sentiment }}",
+            "category": "={{ JSON.parse($json.content.parts[0].text).category }}",
+            "summary": "={{ JSON.parse($json.content.parts[0].text).summary }}",
+            "action_needed": "={{ JSON.parse($json.content.parts[0].text).action_needed }}",
+            "review_timestamp": "={{ $('Get row(s) in sheet').item.json.review_timestamp }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "review_id",
+              "displayName": "review_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "review_text",
+              "displayName": "review_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "review_rating",
+              "displayName": "review_rating",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "review_timestamp",
+              "displayName": "review_timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sentiment Positive / Negative / Neutral",
+              "displayName": "sentiment Positive / Negative / Neutral",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "summary",
+              "displayName": "summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "action_needed",
+              "displayName": "action_needed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        688,
+        -176
+      ],
+      "id": "3f8b35db-1934-4dba-a440-4d0dab0c36c9",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "nkVjzk7SuRTMu9uH",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1DHABCUZe1CS-LZ9_xXEG5e3QZFbVo1uuNQNcXma4Syc",
+          "mode": "list",
+          "cachedResultName": "LinkedIn App Google Store Reviews",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DHABCUZe1CS-LZ9_xXEG5e3QZFbVo1uuNQNcXma4Syc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Raw_Reviews",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DHABCUZe1CS-LZ9_xXEG5e3QZFbVo1uuNQNcXma4Syc/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "status": "Processed",
+            "review_id": "={{ $('Get row(s) in sheet').item.json.review_id }}"
+          },
+          "matchingColumns": [
+            "review_id"
+          ],
+          "schema": [
+            {
+              "id": "review_id",
+              "displayName": "review_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "review_text",
+              "displayName": "review_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "review_rating",
+              "displayName": "review_rating",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "review_timestamp",
+              "displayName": "review_timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        880,
+        -176
+      ],
+      "id": "f7847568-ccde-4d10-8339-e092a4928f70",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "nkVjzk7SuRTMu9uH",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "791b7993-0f5d-49da-ad34-72675f7f13b4",
+              "leftValue": "={{ $('Append row in sheet').item.json.action_needed }}",
+              "rightValue": "Yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        1056,
+        -176
+      ],
+      "id": "d6363901-afe8-413f-9281-2bc7a1d2c664",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_CHAT_ID",
+        "text": "=NEW ACTION REQUIRED\n\nReview ID: {{ $json.review_id }}\nRating: {{ $('Append row in sheet').item.json.review_rating }} / 5\nCategory: {{ $('Append row in sheet').item.json.category }}\nSentiment: {{ $('Append row in sheet').item.json['sentiment Positive / Negative / Neutral'] }}\n\nSummary: \n{{ $('Append row in sheet').item.json.summary }}\n\nOriginal Review: \n{{ $('Append row in sheet').item.json.review_text }}\n\nImmediate support reaction required!",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1248,
+        -288
+      ],
+      "id": "c4df6f24-54b1-48ba-aea5-d68fa9be97fb",
+      "name": "Send a text message",
+      "webhookId": "a4b53d7f-b239-42b0-a3c0-06929533e1be",
+      "credentials": {
+        "telegramApi": {
+          "id": "LgSjcfnaQWlEePKe",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": []
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1DHABCUZe1CS-LZ9_xXEG5e3QZFbVo1uuNQNcXma4Syc",
+          "mode": "list",
+          "cachedResultName": "LinkedIn App Google Store Reviews",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DHABCUZe1CS-LZ9_xXEG5e3QZFbVo1uuNQNcXma4Syc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Raw_Reviews",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DHABCUZe1CS-LZ9_xXEG5e3QZFbVo1uuNQNcXma4Syc/edit#gid=0"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        64,
+        -176
+      ],
+      "id": "57300b51-2039-49b3-a049-deae99388ffe",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "2JiO15EOYm6N2bU9",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "19126abe-9eed-4d65-a330-040ec82a6de3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7e9fe1407af42585389be5c1803186e7db6cb0c447cc89d33bbd3a1392351f7d"
+  },
+  "nodeGroups": [],
+  "id": "Vkb5WUJIyVAwSsTk",
+  "tags": []
+}
